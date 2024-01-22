@@ -2,7 +2,8 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\LedgerController;
+use App\Http\Controllers\CustomerController;
+use App\Http\Controllers\AreaController;
 
 /*
 |--------------------------------------------------------------------------
@@ -19,9 +20,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-//Product ledger report routes
-Route::get('/ledger', [LedgerController::class, 'index'])->name('ledger.index');
+//customers
+Route::apiResource('customers', CustomerController::class);
 
-//ledger report
-Route::post('reports/sales', [LedgerController::class, 'reportSales'])->name('reports.sales');
-Route::get('products/sales', [LedgerController::class, 'productSaleDetails'])->name('products.sales');
+//areas
+Route::apiResource('areas', AreaController::class);

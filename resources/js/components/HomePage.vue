@@ -7,99 +7,74 @@
             <div class="page-header">
                 <div class="row">
                     <div class="col-sm-12">
-                        <!-- <v-btn color="primary" class="my-2">Button</v-btn> -->
-                        <v-alert dismissible type="success">Vueitfy installed successfully!</v-alert>
-                        <!-- <v-icon icon="fas fa-home" /> -->
-
-                        <h3 class="page-title">Ledger Report</h3>
+                        <h3 class="page-title">PRACTICAL SKILL TEST</h3>
                         <ul class="breadcrumb">
                             <li class="breadcrumb-item"><a href="#l">Dashboard</a></li>
-                            <li class="breadcrumb-item active">Product Ledger Report</li>
+                            <li class="breadcrumb-item active">Area with code</li>
                         </ul>
                     </div>
                 </div>
             </div>
             <!-- /Page Header -->
             
-            <!-- Search Filter -->
-            <form @submit.prevent="search">
-                <div class="row filter-row">
-                    <div class="col-sm-6 col-md-3"> 
-                        <div class="form-group form-focus select-focus">
-                            <label class="focus-label">Purchased By</label>
-                            <select class="form-control" @change="selectItem(2)">
-                                <option>-Select-</option>
-                                <option v-for="(i, index) in itemArr" :key="index"
-                                    v-bind:value="i.id">
-                                    {{ i.product.name }}
-                                </option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="col-sm-6 col-md-3">  
-                        <div class=" form-focus">
-                            <label class="focus-label">From</label>
-                            <input 
-                                class="form-control" 
-                                type="date" 
-                                v-model="item.form_date">
-                        </div>
-                    </div>
-
-                    <div class="col-sm-6 col-md-3">  
-                        <div class="form-group form-focus">
-                            <input 
-                                class="form-control" 
-                                type="date" 
-                                v-model="item.to_date">
-                            <label class="focus-label">To</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 col-md-3">  
-                        <!-- search button -->
-                        <button type="submit" class="btn btn-success btn-block"> Search </button>
-                    </div>
-                </div>
-            </form>
-            <!-- /Search Filter -->
-            
             <div class="row">
                 <div class="col-md-12">
                     <div class="table-responsive">
-                        <table class="table table-striped custom-table mb-0 datatable">
-                            <thead>
-                                <tr>
-                                    <th>Item</th>
-                                    <th>Date</th>
-                                    <th>Rate</th>
-                                    <th>Stock In</th>
-                                    <th>Stock Out</th>
-                                    <th>Stock</th>
-                                    <th>Balance</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr v-for="(item, index) in ledgerReport">
-                                    <td>
-                                        <strong>{{ item.name }}</strong>
-                                    </td>
-                                    <td>{{ item.date }}</td>
-                                    <td>{{ item.purchase_rate }}</td>
-                                    <td>{{ item.stockIn }}</td>
-                                    <td>{{ item.stockOut }}</td>
-                                    <td>{{ item.stock }}</td>
-                                    <td>{{ item.totalAmount }}</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <form ref="form" @submit.prevent="create">
+                            <table class="table table-striped custom-table mb-0 datatable">
+                                <thead>
+                                    <tr style="margin-top:20px;"></tr>
+                                    <tr>
+                                        <th>Code</th>
+                                        <th>Full Name</th>
+                                        <th>Age</th>
+                                        <th>Location</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        Add New Customer
+                                        <hr>
+                                    </tr>
+                                    <tr v-for="(item, index) in customers" :key="index">
+                                        <td>
+                                            <input type="number" class="form-control" v-model="item.code" placeholder="Enter Code" />
+                                        </td>
+                                        <td>
+                                            <input type="text" class="form-control" v-model="item.full_name" placeholder="Enter Full Name" />
+                                        </td>
+                                        <td>
+                                            <input type="number" class="form-control" v-model="item.age" placeholder="Enter Age" />
+                                        </td>
+                                        <td>
+                                            <select class="form-control" v-model="item.location" @change="selectArea">
+                                                <option v-for="location in areas" :key="location.id" v-bind:value="location.id">
+                                                    {{ location.name }}
+                                                </option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <a class="mr-2 text-danger" href="javascript:"
+                                                v-if="index != 0"
+                                                @click="remove(index)">
+                                                <i class="fa fa-trash"></i>
+                                            </a>
 
-                        <!-- pagination -->
-                        <pagination v-if="pagination.last_page > 1"
-                            :pagination="pagination"
-                            :offset="5"
-                            @paginate="productDetails()">
-                        </pagination>
+                                            <a class="mr-4" href="javascript:"
+                                                v-if="index == customers.length - 1" 
+                                                @click="add(index)">
+                                                <i class="fa fa-plus-circle"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <div class="submit-section">
+                                <button type="submit" class="btn btn-primary submit-btn">Submit</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -109,115 +84,95 @@
     <!-- /Page Wrapper -->
 </template>
 
-<script>
-    import axios from 'axios';
-    import pagination from './partials/Pagination.vue';
-    
+<script>    
     export default {
         name: "HomePage",
 
-        components: {
-            pagination,
-        },
-
         data() {
             return {
-                items: {},
-                itemArr: {},
-                ledgerReport: {},
-                salesList: {},
-                totalAmount: 0,
-                stockIn: 0,
-                stockOut: 0,
-                stock: 0,
-
-                item: {
-                    product_id: '',
-                    form_date: '',
-                    to_date: '',
-                },
-
-                pagination: {
-                    current_page:1,
-                },
+                customers: [
+                    {
+                        code: '',
+                        full_name: '',
+                        age: '',
+                        location: ''
+                    }
+                ],
+                areas:[],
+                selectedLocation: '',
             };
         },
 
         methods: {
-            //get product list
-            async saleDetails(){
-                await axios.get(`/api/ledger`).then(({data})=>{
-                    this.itemArr = data.SaleDetails;
-
-                    // console.log('data=>', this.itemArr);
-
-                }).catch((error)=>{
-                    console.log('error', error);
+            add(index) {
+                this.customers.push({
+                    code: '',
+                    full_name: '',
+                    age: '',
+                    location: ''
                 });
             },
 
-            // insert search data
-            //how to filter search or how to get data from database
-            search(){
-                axios.post(`/api/reports/sales`, this.item)
-                    .then(response => {
-                        this.totalAmount = response.data.totalAmount;
-                        this.stockIn = response.data.stockIn;
-                        this.stockOut = response.data.stockOut;
-                        this.stock = response.data.stock;
-
-                        this.ledgerReport = response.data.saleDetails;
-
-                        this.ledgerReport.forEach((item, index) => {
-                            this.ledgerReport[index].totalAmount = this.totalAmount;
-                            this.ledgerReport[index].stockIn = this.stockIn;
-                            this.ledgerReport[index].stockOut = this.stockOut;
-                            this.ledgerReport[index].stock = this.stock;
-                        });
-
-                        // console.log('data=>', this.ledgerReport);
-
-                    }).catch(error => {
-                    console.log(error);
-                })
+            remove(index) {
+                this.customers.splice(index, 1);
             },
 
-            //get product details
-            async productDetails(){
-                await axios.get('/api/products/sales?page=' + this.pagination.current_page).then(({data})=>{
-                    this.ledgerReport = data.saleDetails.data;
-                    this.pagination = data.saleDetails;
-                    // console.log('data=>', this.pagination);
+            async getCustomers() {
+                try {
+                    const response = await axios.get('/api/areas');
+                    this.areas = response.data;
+                } catch (error) {
+                    console.log(error);
+                }
+            },
 
-                    this.totalAmount = data.totalAmount.data;
-                    this.stockIn = data.stockIn.data;
-                    this.stockOut = data.stockOut.data;
-                    this.stock = data.stock.data;
-
-                    // console.log('data=>', this.ledgerReport);
-                    
-                    this.ledgerReport.forEach((item, index) => {
-                        this.ledgerReport[index].totalAmount = this.totalAmount[index];
-                        this.ledgerReport[index].stockIn = this.stockIn[index];
-                        this.ledgerReport[index].stockOut = this.stockOut[index];
-                        this.ledgerReport[index].stock = this.stock[index];
+            async selectArea() {
+                try {
+                    const singleArea = this.customers.map(customer => {
+                        return this.areas.find(area => area.id == customer.location);
                     });
 
-                    // console.log('data=>', this.ledgerReport);
+                    const area = singleArea[singleArea.length - 1];                    
+                    const code = area.code;
+                    const id = area.id;
 
-                }).catch((error)=>{
-                    console.log('error', error);
-                });
+                    const lastCode = code.substr(code.length - 3);
+                    const newCode = parseInt(lastCode) + id;
+                    const newCodeLength = newCode.toString().length;
+                    const newCodeZero = '0'.repeat(3 - newCodeLength);
+                    const newCodeString = code.substr(0, code.length - 3) + newCodeZero + newCode;
+                    const finalCode = code+newCodeString;
+
+                    this.customers[this.customers.length - 1].code = finalCode;
+
+                } catch (error) {
+                    console.log(error);
+                }
             },
 
-            selectItem: function(id){
-                this.item.product_id = id;
-            },
+            async create() {
+                try {            
+                    this.customers.forEach(customer => {
+                        customer.location = parseInt(customer.location);
+                    });    
+                    const response = await axios.post('/api/customers', this.customers);
+                    this.$refs.form.reset();
+                    this.customers = [
+                        {
+                            code: '',
+                            full_name: '',
+                            age: '',
+                            location: ''
+                        }
+                    ];
+                } catch (error) {
+                    console.log(error);
+                }
+            }
         },
-
+        
         mounted() {
-            this.saleDetails();
-            this.productDetails();
-        },
+            this.getCustomers();
+        }
     }
 </script>

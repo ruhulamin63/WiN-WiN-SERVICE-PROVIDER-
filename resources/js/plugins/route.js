@@ -3,20 +3,13 @@ import {createWebHistory, createRouter} from "vue-router";
 
 //auth route
 import HomePage from "../components/HomePage.vue";
-import Pagination from "../components/partials/Pagination.vue";
 
 const routes = [
     {
-        path:"/report",
+        path:"/",
         name:"HomePage",
         component:HomePage,
     },
-
-    {
-        path:"/paginate",
-        name:"Pagination",
-        component:Pagination,
-    }
 ];
 
 const router = createRouter({
